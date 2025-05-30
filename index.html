@@ -1,73 +1,271 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat-RAG-Bot Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+        rel="stylesheet"
+        as="style"
+        onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>SFVRAG Chatbot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input[type="text"] { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #responseArea { margin-top: 20px; padding: 10px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; min-height: 50px; }
-        .loading { text-align: center; font-style: italic; }
+        /* Kleine Anpassung für Ladeanzeige und bessere Lesbarkeit der Antworten */
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            display: inline-block;
+        }
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }
+        .qa-entry {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Styling für die Scrollbar im Chatverlauf (optional) */
+        #qaHistoryContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        #qaHistoryContainer::-webkit-scrollbar-track {
+            background: #f8fcfa; /* Hintergrundfarbe des Tracks */
+            border-radius: 10px;
+        }
+        #qaHistoryContainer::-webkit-scrollbar-thumb {
+            background: #cde9df; /* Farbe des Scrollbalkens */
+            border-radius: 10px;
+        }
+        #qaHistoryContainer::-webkit-scrollbar-thumb:hover {
+            background: #46a080; /* Farbe des Scrollbalkens beim Hover */
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Chat-RAG-Bot Test-Frontend 🤖</h1>
-        <input type="text" id="userInput" placeholder="Deine Nachricht...">
-        <button onclick="sendMessage()">Senden</button>
-        <h2>Antwort vom Bot:</h2>
-        <div id="responseArea">Warte auf Antwort...</div>
+<body class="bg-[#f8fcfa]">
+    <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6f4ef] px-10 py-3">
+                <div class="flex items-center gap-4 text-[#0c1c17]">
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path></svg>
+                    </div>
+                    <h2 class="text-[#0c1c17] text-lg font-bold leading-tight tracking-[-0.015em]">SFVRAG-Chatbot</h2>
+                </div>
+                <div class="flex flex-1 justify-end gap-8">
+                    <div class="flex items-center gap-9">
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Startseite</a>
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Über uns</a>
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Kontakt</a>
+                    </div>
+                    <button
+                        class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 bg-[#e6f4ef] text-[#0c1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+                        aria-label="Hilfe"
+                    >
+                        <div class="text-[#0c1c17]" data-icon="Question" data-size="20px" data-weight="regular">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path
+                                    d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"
+                                ></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div
+                        class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://placehold.co/40x40/e6f4ef/0c1c17?text=U");'
+                        title="Benutzerprofilbild"
+                    ></div>
+                </div>
+            </header>
+
+            <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                    <h2 class="text-[#0c1c17] tracking-light text-2xl sm:text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Willkommen zu unserem Chatbot</h2>
+                    <p class="text-[#0c1c17] text-base font-normal leading-normal pb-3 pt-1 px-4 text-center">Fragen Sie mich alles, und ich werde mein Bestes tun, um Ihnen zu helfen.</p>
+
+                    <div class="flex flex-col items-center gap-4 px-4 py-3">
+                        <label class="flex flex-col w-full max-w-xl">
+                            <span class="sr-only">Ihre Nachricht</span>
+                            <textarea
+                                id="userInput"
+                                placeholder="Geben Sie hier Ihre Nachricht ein..."
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0c1c17] focus:outline-0 focus:ring-2 focus:ring-[#019863] border border-[#cde9df] bg-white focus:border-[#019863] min-h-24 sm:min-h-36 placeholder:text-[#46a080] p-[15px] text-base font-normal leading-normal shadow-sm"
+                                rows="4"
+                            ></textarea>
+                        </label>
+                        <button
+                            id="sendButton"
+                            class="flex min-w-[120px] max-w-[240px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-[#019863] text-[#f8fcfa] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#017a50] transition-colors duration-150 ease-in-out shadow-md focus:outline-none focus:ring-2 focus:ring-[#019863] focus:ring-offset-2"
+                        >
+                            <span class="truncate">Senden</span>
+                        </button>
+                    </div>
+
+                    <div id="responseContainer" class="px-4 py-3 mt-6">
+                        <h3 class="text-[#0c1c17] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Verlauf</h3>
+                        <div id="loadingIndicator" class="hidden text-center py-5 text-[#0c1c17]">
+                            <div class="loading-dots"><span>.</span><span>.</span><span>.</span></div>
+                            <p class="mt-2 text-sm">Antwort wird geladen...</p>
+                        </div>
+                        <div id="errorMessage" class="hidden text-center py-5 px-4 text-red-600 bg-red-100 border border-red-400 rounded-md"></div>
+                        <div id="qaHistoryContainer" class="p-4 grid gap-y-5 max-h-[50vh] overflow-y-auto">
+                            <div id="emptyHistoryMessage" class="col-span-2 text-center text-gray-500 py-5">
+                                Noch keine Fragen gestellt. Beginnen Sie eine Konversation!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
-        async function sendMessage() {
-            const userInput = document.getElementById('userInput').value;
-            const responseArea = document.getElementById('responseArea');
-            const n8nWebhookUrl = 'https://n8n.selfhosting.work/webhook/b89e0652-f342-4fa5-aa96-ae0c2fc59fc7'; // ⚠️ Ersetze dies mit deiner tatsächlichen Webhook-URL!
+        const userInputElement = document.getElementById('userInput');
+        const sendButtonElement = document.getElementById('sendButton');
+        const qaHistoryContainerElement = document.getElementById('qaHistoryContainer');
+        const loadingIndicatorElement = document.getElementById('loadingIndicator');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const emptyHistoryMessageElement = document.getElementById('emptyHistoryMessage');
 
-            if (!userInput.trim()) {
-                responseArea.innerText = 'Bitte gib eine Nachricht ein.';
+        const n8nWebhookUrl = 'https://n8n.selfhosting.work/webhook/b89e0652-f342-4fa5-aa96-ae0c2fc59fc7'; // Webhook URL aktualisiert
+        const MAX_HISTORY_ITEMS = 10; // Maximale Anzahl von Einträgen im Verlauf
+
+        // Funktion zum Laden des Verlaufs aus localStorage
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('chatHistorySFV')) || [];
+            qaHistoryContainerElement.innerHTML = ''; // Vorherigen Inhalt leeren
+            if (history.length === 0) {
+                emptyHistoryMessageElement.style.display = 'block';
+            } else {
+                emptyHistoryMessageElement.style.display = 'none';
+                history.forEach(item => addQaToDom(item.question, item.answer, false));
+            }
+        }
+
+        // Funktion zum Speichern des Verlaufs in localStorage
+        function saveHistory(question, answer) {
+            let history = JSON.parse(localStorage.getItem('chatHistorySFV')) || [];
+            history.unshift({ question, answer, timestamp: new Date().toISOString() }); // Neues Element am Anfang hinzufügen
+            if (history.length > MAX_HISTORY_ITEMS) {
+                history = history.slice(0, MAX_HISTORY_ITEMS); // Verlauf auf maximale Länge begrenzen
+            }
+            localStorage.setItem('chatHistorySFV', JSON.stringify(history));
+        }
+
+        // Funktion zum Hinzufügen einer Frage und Antwort zum DOM
+        function addQaToDom(question, answer, isNew) {
+            emptyHistoryMessageElement.style.display = 'none';
+
+            const qaEntry = document.createElement('div');
+            qaEntry.className = 'col-span-2 grid grid-cols-[auto_1fr] sm:grid-cols-[15%_1fr] gap-x-4 sm:gap-x-6 border-t border-t-[#cde9df] py-5 qa-entry';
+            if (!isNew) { // Ältere Einträge nicht animieren
+                 qaEntry.style.opacity = '1';
+                 qaEntry.style.transform = 'translateY(0)';
+            }
+
+
+            const questionElement = document.createElement('p');
+            questionElement.className = 'text-[#46a080] text-sm font-semibold leading-normal break-words';
+            questionElement.textContent = question;
+
+            const answerElement = document.createElement('p');
+            answerElement.className = 'text-[#0c1c17] text-sm font-normal leading-normal break-words';
+            // Markdown-ähnliche Formatierung für Fett und Zeilenumbrüche
+            let formattedAnswer = answer.replace(/\n/g, '<br>');
+            formattedAnswer = formattedAnswer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            answerElement.innerHTML = formattedAnswer;
+
+            qaEntry.appendChild(questionElement);
+            qaEntry.appendChild(answerElement);
+
+            // Neue Einträge oben einfügen
+            qaHistoryContainerElement.insertBefore(qaEntry, qaHistoryContainerElement.firstChild);
+        }
+
+        // Funktion zum Senden der Nachricht
+        async function sendMessage() {
+            const question = userInputElement.value.trim();
+            if (!question) {
+                showError('Bitte geben Sie eine Nachricht ein.');
                 return;
             }
 
-            responseArea.innerHTML = '<div class="loading">Sende Daten und warte auf Antwort...</div>';
+            // Die Überprüfung auf 'DEINE_N8N_WEBHOOK_URL' ist nicht mehr notwendig, da die URL jetzt direkt gesetzt ist.
+            // Man könnte hier eine generelle URL-Validierung einbauen, falls gewünscht.
+
+            loadingIndicatorElement.style.display = 'block';
+            errorMessageElement.style.display = 'none';
+            sendButtonElement.disabled = true;
+            sendButtonElement.classList.add('opacity-50', 'cursor-not-allowed');
+
 
             try {
                 const response = await fetch(n8nWebhookUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json', // Frontend sendet JSON
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ query: userInput }) // Sende die Nutzereingabe z.B. als "query"
+                    body: JSON.stringify({ query: question }) // 'query' oder wie dein n8n es erwartet
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP Fehler! Status: ${response.status}`);
+                    const errorData = await response.text(); // Versuche, mehr Fehlerdetails zu bekommen
+                    throw new Error(`HTTP Fehler! Status: ${response.status}. Details: ${errorData}`);
                 }
 
-                // response.json() parst die JSON-Antwort vom n8n Webhook
                 const data = await response.json();
 
                 if (data && data.message) {
-                    // Ersetze \n (escaped newlines) durch <br> für die HTML-Anzeige
-                    // Und **text** durch <b>text</b> für Fettdruck
-                    let formattedMessage = data.message.replace(/\n/g, '<br>');
-                    formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                    responseArea.innerHTML = formattedMessage;
+                    const answer = data.message;
+                    addQaToDom(question, answer, true);
+                    saveHistory(question, answer);
+                    userInputElement.value = ''; // Eingabefeld leeren
                 } else {
-                    // Fallback, falls die Struktur anders ist oder 'message' fehlt
-                    responseArea.innerText = JSON.stringify(data, null, 2);
+                    showError('Unerwartete Antwortstruktur vom Server.');
+                    console.error('Unerwartete Antwort:', data);
                 }
 
             } catch (error) {
                 console.error('Fehler beim Senden der Nachricht:', error);
-                responseArea.innerText = 'Fehler: Konnte keine Antwort vom Server erhalten. Details siehe Konsole.';
+                showError(`Fehler: ${error.message || 'Konnte keine Antwort vom Server erhalten.'}`);
+            } finally {
+                loadingIndicatorElement.style.display = 'none';
+                sendButtonElement.disabled = false;
+                sendButtonElement.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
+
+        function showError(message) {
+            errorMessageElement.textContent = message;
+            errorMessageElement.style.display = 'block';
+        }
+
+        // Event Listener
+        sendButtonElement.addEventListener('click', sendMessage);
+        userInputElement.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) { // Senden mit Enter, Shift+Enter für neue Zeile
+                event.preventDefault(); // Verhindert Standardverhalten (neue Zeile in Textarea)
+                sendMessage();
+            }
+        });
+
+        // Verlauf beim Laden der Seite anzeigen
+        document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
 </body>
 </html>
