@@ -40,18 +40,29 @@
                 const response = await fetch(n8nWebhookUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json', // Frontend sendet JSON
                     },
-                    body: JSON.stringify({ message: userInput })
+                    body: JSON.stringify({ query: userInput }) // Sende die Nutzereingabe z.B. als "query"
                 });
 
                 if (!response.ok) {
                     throw new Error(`HTTP Fehler! Status: ${response.status}`);
                 }
 
+                // response.json() parst die JSON-Antwort vom n8n Webhook
                 const data = await response.json();
-                // Angenommen, dein n8n-Workflow gibt die Antwort in einem Feld namens 'reply' zurück
-                responseArea.innerText = data.reply || JSON.stringify(data, null, 2);
+
+                if (data && data.message) {
+                    // Ersetze \n (escaped newlines) durch <br> für die HTML-Anzeige
+                    // Und **text** durch <b>text</b> für Fettdruck
+                    let formattedMessage = data.message.replace(/\n/g, '<br>');
+                    formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                    responseArea.innerHTML = formattedMessage;
+                } else {
+                    // Fallback, falls die Struktur anders ist oder 'message' fehlt
+                    responseArea.innerText = JSON.stringify(data, null, 2);
+                }
+
             } catch (error) {
                 console.error('Fehler beim Senden der Nachricht:', error);
                 responseArea.innerText = 'Fehler: Konnte keine Antwort vom Server erhalten. Details siehe Konsole.';
