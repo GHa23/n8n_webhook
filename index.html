@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat-RAG-Bot Test</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input[type="text"] { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #responseArea { margin-top: 20px; padding: 10px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; min-height: 50px; }
+        .loading { text-align: center; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chat-RAG-Bot Test-Frontend 🤖</h1>
+        <input type="text" id="userInput" placeholder="Deine Nachricht...">
+        <button onclick="sendMessage()">Senden</button>
+        <h2>Antwort vom Bot:</h2>
+        <div id="responseArea">Warte auf Antwort...</div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            const responseArea = document.getElementById('responseArea');
+            const n8nWebhookUrl = 'DEINE_N8N_WEBHOOK_URL'; // ⚠️ Ersetze dies mit deiner tatsächlichen Webhook-URL!
+
+            if (!userInput.trim()) {
+                responseArea.innerText = 'Bitte gib eine Nachricht ein.';
+                return;
+            }
+
+            responseArea.innerHTML = '<div class="loading">Sende Daten und warte auf Antwort...</div>';
+
+            try {
+                const response = await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userInput })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Fehler! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                // Angenommen, dein n8n-Workflow gibt die Antwort in einem Feld namens 'reply' zurück
+                responseArea.innerText = data.reply || JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Fehler beim Senden der Nachricht:', error);
+                responseArea.innerText = 'Fehler: Konnte keine Antwort vom Server erhalten. Details siehe Konsole.';
+            }
+        }
+    </script>
+</body>
+</html>
