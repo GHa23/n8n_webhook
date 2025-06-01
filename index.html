@@ -55,35 +55,56 @@
         #qaHistoryContainer::-webkit-scrollbar-thumb:hover {
             background: #46a080; /* Farbe des Scrollbalkens beim Hover */
         }
+        /* Styling für das mobile Menü Overlay */
+        #mobileMenu.hidden + main {
+            /* Optional: Wenn das Menü offen ist, könnte man den Hauptinhalt etwas abdunkeln oder verschieben */
+        }
+         /* Animation für das Ein-/Ausblenden des mobilen Menüs */
+        .mobile-menu-enter {
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .mobile-menu-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .mobile-menu-leave {
+            transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .mobile-menu-leave-active {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
     </style>
 </head>
 <body class="bg-[#f8fcfa]">
     <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
-            <header class="flex flex-col items-center gap-4 border-b border-solid border-b-[#e6f4ef] px-4 py-3 sm:flex-row sm:justify-between sm:px-10 sm:gap-0">
+            <header class="relative flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6f4ef] px-4 sm:px-10 py-3">
                 <div class="flex items-center gap-4 text-[#0c1c17]">
-                    <div class="size-4"> <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path></svg>
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path></svg>
                     </div>
                     <h2 class="text-[#0c1c17] text-lg font-bold leading-tight tracking-[-0.015em]">SFVRAG-Chatbot</h2>
                 </div>
-                <div class="flex flex-col items-center gap-4 sm:flex-row sm:flex-1 sm:justify-end sm:gap-8">
-                    <div class="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-9 sm:text-left">
-                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Startseite</a>
-                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Über uns</a>
-                        <a class="text-[#0c1c17] text-sm font-medium leading-normal" href="#">Kontakt</a>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-4">
+
+                <div class="hidden sm:flex flex-1 justify-end items-center gap-8">
+                    <nav class="flex items-center gap-9">
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal hover:text-[#019863]" href="#">Startseite</a>
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal hover:text-[#019863]" href="#">Über uns</a>
+                        <a class="text-[#0c1c17] text-sm font-medium leading-normal hover:text-[#019863]" href="#">Kontakt</a>
+                    </nav>
+                    <div class="flex items-center gap-4">
                         <button
-                            class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 bg-[#e6f4ef] text-[#0c1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+                            class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 bg-[#e6f4ef] text-[#0c1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 hover:bg-[#d1e0da]"
                             aria-label="Hilfe"
                         >
-                            <div class="text-[#0c1c17]" data-icon="Question" data-size="20px" data-weight="regular">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                                    <path
-                                        d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"
-                                    ></path>
-                                </svg>
-                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+                            </svg>
                         </button>
                         <div
                             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
@@ -92,7 +113,23 @@
                         ></div>
                     </div>
                 </div>
+
+                <div class="sm:hidden flex items-center">
+                    <button id="mobileMenuButton" aria-label="Menü öffnen" class="p-2 rounded-md text-[#0c1c17] hover:bg-[#e6f4ef] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#019863]">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path> </svg>
+                    </button>
+                </div>
             </header>
+
+            <div id="mobileMenu" class="hidden sm:hidden bg-[#f8fcfa] border-b border-solid border-b-[#e6f4ef] shadow-lg absolute top-[60px] left-0 right-0 z-20">
+                <nav class="flex flex-col items-center gap-4 px-5 py-5">
+                    <a class="block w-full text-center text-[#0c1c17] text-base font-medium leading-normal py-2 hover:bg-[#e6f4ef] rounded-md" href="#">Startseite</a>
+                    <a class="block w-full text-center text-[#0c1c17] text-base font-medium leading-normal py-2 hover:bg-[#e6f4ef] rounded-md" href="#">Über uns</a>
+                    <a class="block w-full text-center text-[#0c1c17] text-base font-medium leading-normal py-2 hover:bg-[#e6f4ef] rounded-md" href="#">Kontakt</a>
+                    </nav>
+            </div>
+
 
             <main class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
                 <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
@@ -142,14 +179,60 @@
         const loadingIndicatorElement = document.getElementById('loadingIndicator');
         const errorMessageElement = document.getElementById('errorMessage');
         const emptyHistoryMessageElement = document.getElementById('emptyHistoryMessage');
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
 
-        const n8nWebhookUrl = 'https://n8n.selfhosting.work/webhook/b89e0652-f342-4fa5-aa96-ae0c2fc59fc7'; // Webhook URL aktualisiert
-        const MAX_HISTORY_ITEMS = 10; // Maximale Anzahl von Einträgen im Verlauf
+        const n8nWebhookUrl = 'https://n8n.selfhosting.work/webhook/b89e0652-f342-4fa5-aa96-ae0c2fc59fc7';
+        const MAX_HISTORY_ITEMS = 10;
 
-        // Funktion zum Laden des Verlaufs aus localStorage
+        function toggleMobileMenu() {
+            const isHidden = mobileMenu.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('mobile-menu-enter', 'mobile-menu-enter-active');
+                setTimeout(() => {
+                    mobileMenu.classList.remove('mobile-menu-enter', 'mobile-menu-enter-active');
+                }, 300); // Dauer der Animation
+                mobileMenuButton.setAttribute('aria-expanded', 'true');
+                // Change icon to X
+                mobileMenuButton.innerHTML = `
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>`;
+            } else {
+                mobileMenu.classList.add('mobile-menu-leave', 'mobile-menu-leave-active');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('mobile-menu-leave', 'mobile-menu-leave-active');
+                }, 200); // Dauer der Animation
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                // Change icon back to hamburger
+                mobileMenuButton.innerHTML = `
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>`;
+            }
+        }
+
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+        }
+
+        // Close mobile menu if a link is clicked (optional, but good UX)
+        if (mobileMenu) {
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        toggleMobileMenu();
+                    }
+                });
+            });
+        }
+
+
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('chatHistorySFV')) || [];
-            qaHistoryContainerElement.innerHTML = ''; // Vorherigen Inhalt leeren
+            qaHistoryContainerElement.innerHTML = '';
             if (history.length === 0) {
                 emptyHistoryMessageElement.style.display = 'block';
             } else {
@@ -158,27 +241,23 @@
             }
         }
 
-        // Funktion zum Speichern des Verlaufs in localStorage
         function saveHistory(question, answer) {
             let history = JSON.parse(localStorage.getItem('chatHistorySFV')) || [];
-            history.unshift({ question, answer, timestamp: new Date().toISOString() }); // Neues Element am Anfang hinzufügen
+            history.unshift({ question, answer, timestamp: new Date().toISOString() });
             if (history.length > MAX_HISTORY_ITEMS) {
-                history = history.slice(0, MAX_HISTORY_ITEMS); // Verlauf auf maximale Länge begrenzen
+                history = history.slice(0, MAX_HISTORY_ITEMS);
             }
             localStorage.setItem('chatHistorySFV', JSON.stringify(history));
         }
 
-        // Funktion zum Hinzufügen einer Frage und Antwort zum DOM
         function addQaToDom(question, answer, isNew) {
             emptyHistoryMessageElement.style.display = 'none';
-
             const qaEntry = document.createElement('div');
             qaEntry.className = 'col-span-2 grid grid-cols-[auto_1fr] sm:grid-cols-[15%_1fr] gap-x-4 sm:gap-x-6 border-t border-t-[#cde9df] py-5 qa-entry';
-            if (!isNew) { // Ältere Einträge nicht animieren
+            if (!isNew) {
                  qaEntry.style.opacity = '1';
                  qaEntry.style.transform = 'translateY(0)';
             }
-
 
             const questionElement = document.createElement('p');
             questionElement.className = 'text-[#46a080] text-sm font-semibold leading-normal break-words';
@@ -186,19 +265,15 @@
 
             const answerElement = document.createElement('p');
             answerElement.className = 'text-[#0c1c17] text-sm font-normal leading-normal break-words';
-            // Markdown-ähnliche Formatierung für Fett und Zeilenumbrüche
             let formattedAnswer = answer.replace(/\n/g, '<br>');
             formattedAnswer = formattedAnswer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             answerElement.innerHTML = formattedAnswer;
 
             qaEntry.appendChild(questionElement);
             qaEntry.appendChild(answerElement);
-
-            // Neue Einträge oben einfügen
             qaHistoryContainerElement.insertBefore(qaEntry, qaHistoryContainerElement.firstChild);
         }
 
-        // Funktion zum Senden der Nachricht
         async function sendMessage() {
             const question = userInputElement.value.trim();
             if (!question) {
@@ -206,41 +281,33 @@
                 return;
             }
 
-            // Die Überprüfung auf 'DEINE_N8N_WEBHOOK_URL' ist nicht mehr notwendig, da die URL jetzt direkt gesetzt ist.
-            // Man könnte hier eine generelle URL-Validierung einbauen, falls gewünscht.
-
             loadingIndicatorElement.style.display = 'block';
             errorMessageElement.style.display = 'none';
             sendButtonElement.disabled = true;
             sendButtonElement.classList.add('opacity-50', 'cursor-not-allowed');
 
-
             try {
                 const response = await fetch(n8nWebhookUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ query: question }) // 'query' oder wie dein n8n es erwartet
+                    headers: { 'Content-Type': 'application/json', },
+                    body: JSON.stringify({ query: question })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.text(); // Versuche, mehr Fehlerdetails zu bekommen
+                    const errorData = await response.text();
                     throw new Error(`HTTP Fehler! Status: ${response.status}. Details: ${errorData}`);
                 }
 
                 const data = await response.json();
-
                 if (data && data.message) {
                     const answer = data.message;
                     addQaToDom(question, answer, true);
                     saveHistory(question, answer);
-                    userInputElement.value = ''; // Eingabefeld leeren
+                    userInputElement.value = '';
                 } else {
                     showError('Unerwartete Antwortstruktur vom Server.');
                     console.error('Unerwartete Antwort:', data);
                 }
-
             } catch (error) {
                 console.error('Fehler beim Senden der Nachricht:', error);
                 showError(`Fehler: ${error.message || 'Konnte keine Antwort vom Server erhalten.'}`);
@@ -256,16 +323,13 @@
             errorMessageElement.style.display = 'block';
         }
 
-        // Event Listener
         sendButtonElement.addEventListener('click', sendMessage);
         userInputElement.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) { // Senden mit Enter, Shift+Enter für neue Zeile
-                event.preventDefault(); // Verhindert Standardverhalten (neue Zeile in Textarea)
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendMessage();
             }
         });
-
-        // Verlauf beim Laden der Seite anzeigen
         document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
 </body>
