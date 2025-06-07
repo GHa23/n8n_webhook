@@ -72,7 +72,7 @@ The core logic is contained within `<script>` tags:
 
 ### n8n Webhook Interaction
 - When a user sends a message, the `sendMessage` function is triggered.
-- It retrieves the user's input and makes an asynchronous `POST` request to the `n8nWebhookUrl` (currently `https://n8n.selfhosting.work/webhook/b89e0652-f342-4fa5-aa96-ae0c2fc59fc7`).
+- It retrieves the user's input and makes an asynchronous `POST` request to the `n8nWebhookUrl` 
 - The request body is a JSON object containing the user's query: `{ "query": "user's message" }`.
 - The script then waits for a response from the n8n webhook.
 - If the webhook call is successful and returns a JSON response with a `message` property, this message is considered the chatbot's answer.
